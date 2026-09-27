@@ -1,0 +1,21 @@
+{
+  "name": "scacchi-next",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "test": "node --test tests/*.test.cjs",
+    "dati": "python scripts/estrai_partite.py --base data/partite.csv --out data/partite.csv --cache data/archivi",
+    "vetrina": "node scripts/prepara-vetrina.cjs"
+  },
+  "dependencies": {
+    "csv-parse": "7.0.3",
+    "next": "16.3.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1"
+  }
+}

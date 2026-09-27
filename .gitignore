@@ -1,0 +1,7 @@
+node_modules/
+.next/
+models/*.json
+models/*.tmp
+models/.training.lock
+data/archivi/
+__pycache__/
