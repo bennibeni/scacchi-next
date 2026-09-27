@@ -80,3 +80,25 @@ button.small{margin:0;padding:8px 14px;font-size:12px}
 .notice.warn{background:#fff6e0;color:#7a5412}
 .demoList{display:grid;gap:10px;margin:16px 0}.demoList>div{background:#f3f5f9;border-radius:10px;padding:12px 14px;font-size:14px}.demoList small{margin-top:4px}
 .actionRow small{display:inline}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 38px;
+  padding-top: 17px;
+  border-top: 1px solid #aeb1a9;
+  color: #747a75;
+  font:
+    400 10px DM Mono,
+    monospace;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.projects-footer a {
+  color: #747a75;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.projects-footer a:hover {
+  color: #d14b37;
+}
