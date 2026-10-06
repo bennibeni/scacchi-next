@@ -1,5 +1,5 @@
-"use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+'use client';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   avviaAddestramento,
   avviaAggiornamento,
@@ -9,49 +9,41 @@ import {
   prevedi,
   riepilogoDati,
   statoLavori,
-} from "./actions";
-import GuideModal, { Help, lastGuidePage } from "./GuideModal";
+} from './actions';
+import GuideModal, { Help, lastGuidePage } from './GuideModal';
 
 const NAMES = {
-  elo: "Formula Elo",
-  logistic: "Regressione logistica",
-  tree: "Albero decisionale",
-  forest: "Random Forest",
+  elo: 'Formula Elo',
+  logistic: 'Regressione logistica',
+  tree: 'Albero decisionale',
+  forest: 'Random Forest',
 };
 const PERIODS = {
-  tutto: "Tutto lo storico (dal 2016)",
-  dal2020: "Dal 2020",
-  dal2023: "Dal 2023",
+  tutto: 'Tutto lo storico (dal 2016)',
+  dal2020: 'Dal 2020',
+  dal2023: 'Dal 2023',
 };
-const DAYS = [
-  "lunedì",
-  "martedì",
-  "mercoledì",
-  "giovedì",
-  "venerdì",
-  "sabato",
-  "domenica",
-];
+const DAYS = ['lunedì', 'martedì', 'mercoledì', 'giovedì', 'venerdì', 'sabato', 'domenica'];
 const pct = (v, d = 1) =>
-  `${(v * 100).toLocaleString("it-IT", { minimumFractionDigits: d, maximumFractionDigits: d })}%`;
+  `${(v * 100).toLocaleString('it-IT', { minimumFractionDigits: d, maximumFractionDigits: d })}%`;
 const num = (v, d = 4) =>
-  v.toLocaleString("it-IT", {
+  v.toLocaleString('it-IT', {
     minimumFractionDigits: d,
     maximumFractionDigits: d,
   });
-const int = (v) => v.toLocaleString("it-IT");
-const date = (s) => (s ? new Date(s).toLocaleDateString("it-IT") : "–");
+const int = (v) => v.toLocaleString('it-IT');
+const date = (s) => (s ? new Date(s).toLocaleDateString('it-IT') : '–');
 
 function duration({ period, trees, depth }) {
   const heavy =
     Number(trees) *
     (Number(depth) >= 8 ? 2 : 1) *
-    (period === "tutto" ? 1 : period === "dal2020" ? 0.6 : 0.25);
+    (period === 'tutto' ? 1 : period === 'dal2020' ? 0.6 : 0.25);
   return heavy > 300
-    ? "Durata indicativa: meno di un minuto."
+    ? 'Durata indicativa: meno di un minuto.'
     : heavy > 100
-      ? "Durata indicativa: 20–40 secondi."
-      : "Durata indicativa: 5–30 secondi.";
+      ? 'Durata indicativa: 20–40 secondi.'
+      : 'Durata indicativa: 5–30 secondi.';
 }
 
 /** Barre orizzontali per l'importanza: un effetto entro 2 deviazioni standard da zero non è distinguibile dal caso. */
@@ -66,13 +58,13 @@ function Importance({ items }) {
             <span className="barLabel">{i.label}</span>
             <span className="barTrack">
               <span
-                className={real ? "bar" : "bar weak"}
+                className={real ? 'bar' : 'bar weak'}
                 style={{ width: `${(Math.max(0, i.delta) / max) * 100}%` }}
               />
             </span>
             <span className="barValue">
-              {real ? `+${num(i.delta * 1e4, 1)}` : "nessun effetto"}
-              <small>{real ? ` ±${num(i.sd * 1e4, 1)}` : ""}</small>
+              {real ? `+${num(i.delta * 1e4, 1)}` : 'nessun effetto'}
+              <small>{real ? ` ±${num(i.sd * 1e4, 1)}` : ''}</small>
             </span>
           </div>
         );
@@ -94,11 +86,11 @@ function WhatIf({ items, labelOf, selected, title, caption }) {
         {title}
         <small>{caption}</small>
       </figcaption>
-      <div className="cols" style={{ "--half": h(0.5) }}>
+      <div className="cols" style={{ '--half': h(0.5) }}>
         {items.map((it, k) => (
           <div
             key={k}
-            className={`col${selected === k ? " sel" : ""}${it.p === best ? " best" : ""}`}
+            className={`col${selected === k ? ' sel' : ''}${it.p === best ? ' best' : ''}`}
             title={`${labelOf(it, k)}: ${pct(it.p)}`}
           >
             <span className="colBar" style={{ height: h(it.p) }}>
@@ -114,20 +106,20 @@ function WhatIf({ items, labelOf, selected, title, caption }) {
 
 export default function Home() {
   const [config, setConfig] = useState({
-    period: "tutto",
-    trees: "100",
-    depth: "6",
+    period: 'tutto',
+    trees: '100',
+    depth: '6',
   });
   const [data, setData] = useState(undefined); // undefined = in lettura, null = CSV assente;
   const [models, setModels] = useState([]),
     [skipped, setSkipped] = useState([]),
-    [selected, setSelected] = useState("");
+    [selected, setSelected] = useState('');
   const [active, setActive] = useState(null),
     [result, setResult] = useState(null),
     [showAllTest, setShowAllTest] = useState(false);
-  const [busy, setBusy] = useState(""),
-    [error, setError] = useState(""),
-    [notice, setNotice] = useState(""),
+  const [busy, setBusy] = useState(''),
+    [error, setError] = useState(''),
+    [notice, setNotice] = useState(''),
     [noticeWarn, setNoticeWarn] = useState(false),
     [prediction, setPrediction] = useState(null);
   // Lavoro sul server (aggiornamento dati o addestramento), letto dal lock: sopravvive al ricaricamento della pagina.
@@ -137,22 +129,22 @@ export default function Home() {
   // Vetrina (Vercel): sola lettura, modelli dimostrativi già addestrati. null = modalità non ancora nota.
   const [readOnly, setReadOnly] = useState(null);
   const [values, setValues] = useState({
-    colore: "bianco",
-    elo_mio: "1000",
-    elo_avv: "1000",
-    pausa: "0.5",
-    posizione: "3",
-    ora: "20",
+    colore: 'bianco',
+    elo_mio: '1000',
+    elo_avv: '1000',
+    pausa: '0.5',
+    posizione: '3',
+    ora: '20',
     giorno: String(((new Date().getDay() + 6) % 7) + 1),
-    partite_oggi: "5",
-    trend: "0",
-    apertura: "",
+    partite_oggi: '5',
+    trend: '0',
+    apertura: '',
   });
   const [guidePage, setGuidePage] = useState(null),
     [guideOpener, setGuideOpener] = useState(null);
   const openGuide = useCallback((page, opener) => {
     setGuideOpener(opener ?? null);
-    setGuidePage(page ?? lastGuidePage() ?? "benvenuto");
+    setGuidePage(page ?? lastGuidePage() ?? 'benvenuto');
   }, []);
   const closeGuide = useCallback(() => setGuidePage(null), []);
   const openings = active?.openings?.[values.colore] ?? [];
@@ -174,7 +166,7 @@ export default function Home() {
       .catch((e) => setError(e.message));
     riepilogoDati()
       .then((res) => (res.success ? setData(res.data) : setError(res.error)))
-      .catch(() => setError("Impossibile leggere il riepilogo dei dati."));
+      .catch(() => setError('Impossibile leggere il riepilogo dei dati.'));
   }, []);
   // Quando cambia il modello o il colore, l'apertura deve appartenere all'elenco del modello.
   useEffect(() => {
@@ -184,14 +176,14 @@ export default function Home() {
 
   async function perform(label, task) {
     setBusy(label);
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     try {
       await task();
     } catch (e) {
-      setError(e.message || "Richiesta interrotta. Riprova.");
+      setError(e.message || 'Richiesta interrotta. Riprova.');
     } finally {
-      setBusy("");
+      setBusy('');
     }
   }
   function activate(meta) {
@@ -203,8 +195,8 @@ export default function Home() {
   }
   async function train(event) {
     event.preventDefault();
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     const res = await avviaAddestramento(config);
     if (!res.success) {
       setError(res.error);
@@ -212,15 +204,15 @@ export default function Home() {
     }
     wasRunning.current = true;
     setJob({
-      kind: "addestramento",
-      label: "Addestramento",
+      kind: 'addestramento',
+      label: 'Addestramento',
       startedAt: res.startedAt,
       progress: null,
     });
   }
   async function refreshData() {
-    setError("");
-    setNotice("");
+    setError('');
+    setNotice('');
     const res = await avviaAggiornamento();
     if (!res.success) {
       setError(res.error);
@@ -228,8 +220,8 @@ export default function Home() {
     }
     wasRunning.current = true;
     setJob({
-      kind: "dati",
-      label: "Aggiornamento dei dati",
+      kind: 'dati',
+      label: 'Aggiornamento dei dati',
       startedAt: res.startedAt,
       progress: null,
     });
@@ -242,13 +234,13 @@ export default function Home() {
     const last = res.last,
       recent = last && Date.now() - Date.parse(last.finishedAt) < 120000;
     if (wasRunning.current && !res.running && last) {
-      if (last.kind === "dati") {
+      if (last.kind === 'dati') {
         if (last.ok) {
           setNoticeWarn(false);
           setNotice(last.message);
           riepilogoDati().then((r) => r.success && setData(r.data));
         } else setError(last.message);
-      } else if (last.kind === "addestramento") {
+      } else if (last.kind === 'addestramento') {
         // Il modello appena salvato diventa quello attivo, come se fosse stato caricato dall'archivio.
         if (last.ok && last.detail?.id)
           caricaModello(last.detail.id).then((r) =>
@@ -278,17 +270,17 @@ export default function Home() {
   function jobText(j) {
     const p = j.progress,
       since = j.startedAt
-        ? ` · iniziato alle ${new Date(j.startedAt).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}`
-        : "";
-    if (j.kind === "dati")
+        ? ` · iniziato alle ${new Date(j.startedAt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}`
+        : '';
+    if (j.kind === 'dati')
       return p
-        ? `${p.incremental ? "Aggiornamento incrementale" : "Download completo dello storico"}: mese ${p.done} di ${p.total} (${p.month})${since}`
+        ? `${p.incremental ? 'Aggiornamento incrementale' : 'Download completo dello storico'}: mese ${p.done} di ${p.total} (${p.month})${since}`
         : `Avvio dell’aggiornamento dei dati…${since}`;
     return `${p?.label ?? `${j.label} in corso…`}${since}`;
   }
 
   async function load() {
-    await perform("Caricamento dal disco…", async () => {
+    await perform('Caricamento dal disco…', async () => {
       const res = await caricaModello(selected);
       if (!res.success) throw new Error(res.error);
       activate(res.result);
@@ -297,7 +289,7 @@ export default function Home() {
   async function predict(event) {
     event.preventDefault();
     setPrediction(null);
-    await perform("Calcolo della probabilità…", async () => {
+    await perform('Calcolo della probabilità…', async () => {
       const res = await prevedi(active.id, values);
       if (!res.success) throw new Error(res.error);
       setPrediction(res);
@@ -312,21 +304,17 @@ export default function Home() {
   return (
     <main>
       <header>
-        <div className="eyebrow">
-          SCACCOMATTO999 / BULLET 1+0 / MACHINE LEARNING LAB
-        </div>
+        <div className="eyebrow">SCACCOMATTO999 / BULLET 1+0 / MACHINE LEARNING LAB</div>
         <h1>
           Che cosa decide <em>le mie partite?</em>
         </h1>
         <p>
-          Elo, colore, apertura, orario, pause: quattro modelli imparano dalle
-          partite passate e vengono giudicati su quelle più recenti. Poi puoi
-          chiedere a quello scelto quanto vale una partita.
+          Elo, colore, apertura, orario, pause: quattro modelli imparano dalle partite passate e
+          vengono giudicati su quelle più recenti. Poi puoi chiedere a quello scelto quanto vale una
+          partita.
         </p>
         <div className="headRow">
-          <span className="badge">
-            Dati reali chess.com · calcolo sul server
-          </span>
+          <span className="badge">Dati reali chess.com · calcolo sul server</span>
           <button
             type="button"
             className="guideButton"
@@ -349,11 +337,7 @@ export default function Home() {
             <b>20%</b> Partite più recenti · verifica
           </span>
         </div>
-        <Help
-          page="split-temporale"
-          label="perché lo split segue il tempo"
-          onOpen={openGuide}
-        />
+        <Help page="split-temporale" label="perché lo split segue il tempo" onOpen={openGuide} />
       </div>
 
       <div className="dataStrip">
@@ -365,7 +349,7 @@ export default function Home() {
             <span>
               <b>
                 {date(data.from)} → {date(data.to)}
-              </b>{" "}
+              </b>{' '}
               periodo
             </span>
             <span>
@@ -375,13 +359,11 @@ export default function Home() {
         ) : data === undefined ? (
           <span>Lettura delle partite…</span>
         ) : readOnly ? (
-          <span>
-            Dati delle partite non disponibili in questa pubblicazione.
-          </span>
+          <span>Dati delle partite non disponibili in questa pubblicazione.</span>
         ) : (
           <span>
-            Nessun dato letto da <code>data/partite.csv</code>: premi «Aggiorna
-            dati» per scaricarlo da chess.com.
+            Nessun dato letto da <code>data/partite.csv</code>: premi «Aggiorna dati» per scaricarlo
+            da chess.com.
           </span>
         )}
         <span className="stripActions">
@@ -395,18 +377,12 @@ export default function Home() {
               ↻ Aggiorna dati
             </button>
           )}
-          {readOnly && data && (
-            <span className="badge">Dati aggiornati al {date(data.to)}</span>
-          )}
-          <Help
-            page="aggiornare-dati"
-            label="aggiornare i dati"
-            onOpen={openGuide}
-          />
+          {readOnly && data && <span className="badge">Dati aggiornati al {date(data.to)}</span>}
+          <Help page="aggiornare-dati" label="aggiornare i dati" onOpen={openGuide} />
         </span>
       </div>
       {notice && (
-        <div className={noticeWarn ? "notice warn" : "notice"} role="status">
+        <div className={noticeWarn ? 'notice warn' : 'notice'} role="status">
           {notice}
         </div>
       )}
@@ -423,7 +399,7 @@ export default function Home() {
           <div className="status">
             <span className="spinner" />
             {jobText(job)}
-            {job.kind === "dati" && job.progress && (
+            {job.kind === 'dati' && job.progress && (
               <span className="progress">
                 <span
                   style={{
@@ -432,9 +408,7 @@ export default function Home() {
                 />
               </span>
             )}
-            <small>
-              Puoi ricaricare la pagina: il lavoro continua sul server.
-            </small>
+            <small>Puoi ricaricare la pagina: il lavoro continua sul server.</small>
           </div>
         ) : (
           busy && (
@@ -452,24 +426,23 @@ export default function Home() {
             <div className="eyebrow">01 / ESPERIMENTO</div>
             <h2>Versione dimostrativa</h2>
             <p>
-              Questa pubblicazione è in <b>sola lettura</b>: mostra modelli già
-              addestrati sulle partite fino al {data ? date(data.to) : "…"}.
-              Puoi esplorarne i risultati, l’importanza delle colonne e la
-              calibrazione, e chiedere previsioni.
+              Questa pubblicazione è in <b>sola lettura</b>: mostra modelli già addestrati sulle
+              partite fino al {data ? date(data.to) : '…'}. Puoi esplorarne i risultati,
+              l’importanza delle colonne e la calibrazione, e chiedere previsioni.
             </p>
             <p>
-              Addestrare nuovi modelli e aggiornare le partite da chess.com
-              richiede un disco scrivibile e processi lunghi: si fa eseguendo
-              l’app sul proprio computer (<code>npm run dev</code>).
+              Addestrare nuovi modelli e aggiornare le partite da chess.com richiede un disco
+              scrivibile e processi lunghi: si fa eseguendo l’app sul proprio computer (
+              <code>npm run dev</code>).
             </p>
             <div className="demoList">
               {models.map((m) => (
                 <div key={m.id}>
-                  <b>{NAMES[m.kind]}</b> · {PERIODS[m.config.period]} ·{" "}
-                  {m.config.trees} alberi, profondità {m.config.depth}
+                  <b>{NAMES[m.kind]}</b> · {PERIODS[m.config.period]} · {m.config.trees} alberi,
+                  profondità {m.config.depth}
                   <small>
-                    Brier sul test {num(m.test.brier)} contro{" "}
-                    {num(m.eloTest.brier)} della formula Elo
+                    Brier sul test {num(m.test.brier)} contro {num(m.eloTest.brier)} della formula
+                    Elo
                   </small>
                 </div>
               ))}
@@ -488,32 +461,26 @@ export default function Home() {
             <div className="eyebrow">01 / ESPERIMENTO</div>
             <h2>Addestra e confronta</h2>
             <p>
-              Formula Elo, regressione logistica, albero e foresta. Vince chi
-              prevede meglio il periodo di validazione; il vincitore viene
-              riaddestrato e giudicato sulle partite più recenti.
+              Formula Elo, regressione logistica, albero e foresta. Vince chi prevede meglio il
+              periodo di validazione; il vincitore viene riaddestrato e giudicato sulle partite più
+              recenti.
             </p>
             <form onSubmit={train}>
               <div className="field">
                 <div className="fieldHead">
                   <label htmlFor="cfg-period">Partite da utilizzare</label>
-                  <Help
-                    page="impostazioni"
-                    label="scegliere il periodo"
-                    onOpen={openGuide}
-                  />
+                  <Help page="impostazioni" label="scegliere il periodo" onOpen={openGuide} />
                 </div>
                 <select
                   id="cfg-period"
                   disabled={locked}
                   value={config.period}
-                  onChange={(e) =>
-                    setConfig({ ...config, period: e.target.value })
-                  }
+                  onChange={(e) => setConfig({ ...config, period: e.target.value })}
                 >
                   {Object.entries(PERIODS).map(([k, l]) => (
                     <option key={k} value={k}>
                       {l}
-                      {data ? ` · ${int(data.byPeriod[k])} partite` : ""}
+                      {data ? ` · ${int(data.byPeriod[k])} partite` : ''}
                     </option>
                   ))}
                 </select>
@@ -522,19 +489,13 @@ export default function Home() {
                 <div className="field">
                   <div className="fieldHead">
                     <label htmlFor="cfg-trees">Alberi nella foresta</label>
-                    <Help
-                      page="foresta"
-                      label="foresta di alberi"
-                      onOpen={openGuide}
-                    />
+                    <Help page="foresta" label="foresta di alberi" onOpen={openGuide} />
                   </div>
                   <select
                     id="cfg-trees"
                     disabled={locked}
                     value={config.trees}
-                    onChange={(e) =>
-                      setConfig({ ...config, trees: e.target.value })
-                    }
+                    onChange={(e) => setConfig({ ...config, trees: e.target.value })}
                   >
                     {[50, 100, 300].map((n) => (
                       <option key={n}>{n}</option>
@@ -544,19 +505,13 @@ export default function Home() {
                 <div className="field">
                   <div className="fieldHead">
                     <label htmlFor="cfg-depth">Profondità massima</label>
-                    <Help
-                      page="alberi"
-                      label="profondità e overfitting"
-                      onOpen={openGuide}
-                    />
+                    <Help page="alberi" label="profondità e overfitting" onOpen={openGuide} />
                   </div>
                   <select
                     id="cfg-depth"
                     disabled={locked}
                     value={config.depth}
-                    onChange={(e) =>
-                      setConfig({ ...config, depth: e.target.value })
-                    }
+                    onChange={(e) => setConfig({ ...config, depth: e.target.value })}
                   >
                     {[4, 6, 8, 12].map((n) => (
                       <option key={n}>{n}</option>
@@ -565,8 +520,8 @@ export default function Home() {
                 </div>
               </div>
               <small className="hint">
-                {duration(config)} La profondità vale per l’albero singolo e per
-                ogni albero della foresta.
+                {duration(config)} La profondità vale per l’albero singolo e per ogni albero della
+                foresta.
               </small>
               <div className="actionRow">
                 <button type="submit" disabled={locked}>
@@ -588,11 +543,11 @@ export default function Home() {
         )}
         <section className="card">
           <div className="eyebrow">02 / ARCHIVIO</div>
-          <h2>{readOnly ? "Modelli dimostrativi" : "Riprendi un modello"}</h2>
+          <h2>{readOnly ? 'Modelli dimostrativi' : 'Riprendi un modello'}</h2>
           <p>
             {readOnly
-              ? "Scegli uno dei modelli pubblicati e caricalo per vederne i risultati e usarlo nelle previsioni."
-              : "Ogni esperimento è salvato su disco con metriche, importanza delle colonne e regole di codifica."}
+              ? 'Scegli uno dei modelli pubblicati e caricalo per vederne i risultati e usarlo nelle previsioni.'
+              : 'Ogni esperimento è salvato su disco con metriche, importanza delle colonne e regole di codifica.'}
           </p>
           <label>
             Versione salvata
@@ -608,8 +563,8 @@ export default function Home() {
               <option value="">Seleziona un modello</option>
               {models.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {new Date(m.createdAt).toLocaleString("it-IT")} ·{" "}
-                  {NAMES[m.kind]} · {PERIODS[m.config.period].split(" (")[0]}
+                  {new Date(m.createdAt).toLocaleString('it-IT')} · {NAMES[m.kind]} ·{' '}
+                  {PERIODS[m.config.period].split(' (')[0]}
                 </option>
               ))}
             </select>
@@ -617,24 +572,20 @@ export default function Home() {
           {skipped.length > 0 && (
             <div className="warn" role="note">
               {skipped.length === 1
-                ? "Un file in models/ non è leggibile ed è stato ignorato"
+                ? 'Un file in models/ non è leggibile ed è stato ignorato'
                 : `${skipped.length} file in models/ non sono leggibili e sono stati ignorati`}
-              : {skipped.join(", ")}.
+              : {skipped.join(', ')}.
             </div>
           )}
           <div className="pair">
-            <button
-              className="secondary"
-              disabled={!selected || locked}
-              onClick={load}
-            >
-              {readOnly ? "Carica il modello" : "Carica dal disco"}
+            <button className="secondary" disabled={!selected || locked} onClick={load}>
+              {readOnly ? 'Carica il modello' : 'Carica dal disco'}
             </button>
             {!readOnly && (
               <button
                 className="secondary"
                 disabled={locked}
-                onClick={() => perform("Aggiornamento archivio…", refresh)}
+                onClick={() => perform('Aggiornamento archivio…', refresh)}
               >
                 Aggiorna elenco
               </button>
@@ -653,18 +604,12 @@ export default function Home() {
                   </>
                 )}
               </span>
-              <Help
-                page="archivio"
-                label="archivio dei modelli"
-                onOpen={openGuide}
-              />
+              <Help page="archivio" label="archivio dei modelli" onOpen={openGuide} />
             </div>
             {active ? (
               <small>{active.id}</small>
             ) : (
-              <small>
-                Addestra un modello oppure selezionalo dall’archivio.
-              </small>
+              <small>Addestra un modello oppure selezionalo dall’archivio.</small>
             )}
           </div>
         </section>
@@ -673,37 +618,29 @@ export default function Home() {
       {result && (
         <section className="card results">
           <div className="eyebrow">
-            RISULTATI / {int(result.counts.used)} PARTITE /{" "}
+            RISULTATI / {int(result.counts.used)} PARTITE /{' '}
             {PERIODS[result.config.period].toUpperCase()}
           </div>
           <h2>{NAMES[result.kind]} scelto</h2>
           <div className="metrics">
             <div>
               <small className="withHelp">
-                Brier sul test{" "}
-                <Help
-                  page="brier"
-                  label="che cos’è il Brier score"
-                  onOpen={openGuide}
-                />
+                Brier sul test{' '}
+                <Help page="brier" label="che cos’è il Brier score" onOpen={openGuide} />
               </small>
               <strong>{num(result.test.brier)}</strong>
               <small>più basso è meglio · 0,25 = tirare a indovinare</small>
             </div>
             <div>
               <small className="withHelp">
-                Formula Elo sullo stesso test{" "}
-                <Help
-                  page="formula-elo"
-                  label="la formula Elo"
-                  onOpen={openGuide}
-                />
+                Formula Elo sullo stesso test{' '}
+                <Help page="formula-elo" label="la formula Elo" onOpen={openGuide} />
               </small>
               <strong>{num(result.eloTest.brier)}</strong>
               <small>
                 {result.test.brier < result.eloTest.brier
                   ? `il modello la batte dello ${num((1 - result.test.brier / result.eloTest.brier) * 100, 2)}%`
-                  : "il modello non la batte"}
+                  : 'il modello non la batte'}
               </small>
             </div>
             <div>
@@ -715,32 +652,26 @@ export default function Home() {
               <small>Tempo di calcolo</small>
               <strong>{num(result.seconds, 1)} s</strong>
               <small>
-                {int(result.counts.valid)} partite valide su{" "}
-                {int(result.counts.read)}
+                {int(result.counts.valid)} partite valide su {int(result.counts.read)}
               </small>
             </div>
           </div>
           <div className="periods">
             {[
-              ["train", "Training"],
-              ["validation", "Validazione"],
-              ["test", "Test"],
+              ['train', 'Training'],
+              ['validation', 'Validazione'],
+              ['test', 'Test'],
             ].map(([k, l]) => (
               <span key={k}>
-                <b>{l}</b> {date(result.periods[k].from)} →{" "}
-                {date(result.periods[k].to)} · {int(result.periods[k].n)}{" "}
-                partite · {pct(result.periods[k].winRate)} vittorie
+                <b>{l}</b> {date(result.periods[k].from)} → {date(result.periods[k].to)} ·{' '}
+                {int(result.periods[k].n)} partite · {pct(result.periods[k].winRate)} vittorie
               </span>
             ))}
           </div>
 
           <h3 className="withHelp">
-            Confronto dei candidati sulla validazione{" "}
-            <Help
-              page="candidati"
-              label="i quattro candidati"
-              onOpen={openGuide}
-            />
+            Confronto dei candidati sulla validazione{' '}
+            <Help page="candidati" label="i quattro candidati" onOpen={openGuide} />
           </h3>
           <div className="tableWrap">
             <table>
@@ -759,9 +690,7 @@ export default function Home() {
                   <tr key={s.kind}>
                     <td>
                       {NAMES[s.kind]}
-                      {s.kind === result.kind && (
-                        <span className="winner">Scelto</span>
-                      )}
+                      {s.kind === result.kind && <span className="winner">Scelto</span>}
                     </td>
                     <td>{num(s.train.brier)}</td>
                     <td>
@@ -776,9 +705,8 @@ export default function Home() {
             </table>
           </div>
           <small>
-            Un Brier di training molto più basso di quello di validazione indica
-            overfitting: il modello ricorda le partite viste invece di
-            generalizzare.
+            Un Brier di training molto più basso di quello di validazione indica overfitting: il
+            modello ricorda le partite viste invece di generalizzare.
           </small>
           <button
             type="button"
@@ -786,16 +714,14 @@ export default function Home() {
             aria-expanded={showAllTest}
             onClick={() => setShowAllTest((v) => !v)}
           >
-            {showAllTest ? "▾" : "▸"} Mostra il test di tutti i candidati (solo
-            a scopo didattico)
+            {showAllTest ? '▾' : '▸'} Mostra il test di tutti i candidati (solo a scopo didattico)
           </button>
           {showAllTest && (
             <div className="didactic">
               <p>
-                Qui ogni candidato è addestrato sul solo training e misurato sul
-                test. <b>Non si usa per scegliere</b>: se scegliessi guardando
-                queste cifre, il test diventerebbe una seconda validazione e non
-                misurerebbe più nulla di indipendente.
+                Qui ogni candidato è addestrato sul solo training e misurato sul test.{' '}
+                <b>Non si usa per scegliere</b>: se scegliessi guardando queste cifre, il test
+                diventerebbe una seconda validazione e non misurerebbe più nulla di indipendente.
               </p>
               <div className="tableWrap">
                 <table>
@@ -825,32 +751,22 @@ export default function Home() {
           <div className="twoCols">
             <div>
               <h3 className="withHelp">
-                Che cosa conta davvero{" "}
-                <Help
-                  page="importanza"
-                  label="importanza per permutazione"
-                  onOpen={openGuide}
-                />
+                Che cosa conta davvero{' '}
+                <Help page="importanza" label="importanza per permutazione" onOpen={openGuide} />
               </h3>
               <p className="note">
-                Peggioramento del Brier sul test (×10⁻⁴) quando una colonna
-                viene mescolata a caso tra le partite. Grigio: effetto non
-                distinguibile dal caso.
+                Peggioramento del Brier sul test (×10⁻⁴) quando una colonna viene mescolata a caso
+                tra le partite. Grigio: effetto non distinguibile dal caso.
               </p>
               <Importance items={result.importance} />
             </div>
             <div>
               <h3 className="withHelp">
-                Calibrazione sul test{" "}
-                <Help
-                  page="calibrazione"
-                  label="calibrazione"
-                  onOpen={openGuide}
-                />
+                Calibrazione sul test{' '}
+                <Help page="calibrazione" label="calibrazione" onOpen={openGuide} />
               </h3>
               <p className="note">
-                Quando il modello dice «45%», vinci davvero il 45% di quelle
-                partite?
+                Quando il modello dice «45%», vinci davvero il 45% di quelle partite?
               </p>
               <div className="tableWrap">
                 <table className="compact">
@@ -886,24 +802,19 @@ export default function Home() {
       <section className="card">
         <div className="rowBetween">
           <div className="eyebrow">03 / PREVISIONE</div>
-          <Help
-            page="previsione"
-            label="descrivere una partita"
-            onOpen={openGuide}
-          />
+          <Help page="previsione" label="descrivere una partita" onOpen={openGuide} />
         </div>
         <h2>Quanto vale questa partita?</h2>
         <p>
-          Descrivi una partita prima di giocarla. Il modello caricato stima la
-          probabilità di vincerla e mostra come cambierebbe con un’altra ora,
-          un’altra pausa o un’altra apertura.
+          Descrivi una partita prima di giocarla. Il modello caricato stima la probabilità di
+          vincerla e mostra come cambierebbe con un’altra ora, un’altra pausa o un’altra apertura.
         </p>
         <form onSubmit={predict}>
           <fieldset disabled={!active || locked}>
             <div className="gameFields">
               <label>
                 Colore
-                <select value={values.colore} onChange={set("colore")}>
+                <select value={values.colore} onChange={set('colore')}>
                   <option value="bianco">Bianco</option>
                   <option value="nero">Nero</option>
                 </select>
@@ -917,7 +828,7 @@ export default function Home() {
                   max="3500"
                   step="1"
                   value={values.elo_mio}
-                  onChange={set("elo_mio")}
+                  onChange={set('elo_mio')}
                 />
               </label>
               <label>
@@ -929,32 +840,32 @@ export default function Home() {
                   max="3500"
                   step="1"
                   value={values.elo_avv}
-                  onChange={set("elo_avv")}
+                  onChange={set('elo_avv')}
                 />
               </label>
               <label>
                 Apertura
-                <select value={values.apertura} onChange={set("apertura")}>
+                <select value={values.apertura} onChange={set('apertura')}>
                   {openings.map((o) => (
                     <option key={o} value={o}>
-                      {o === "altra" ? "Altra / rara" : o}
+                      {o === 'altra' ? 'Altra / rara' : o}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
                 Ora di inizio
-                <select value={values.ora} onChange={set("ora")}>
+                <select value={values.ora} onChange={set('ora')}>
                   {[...Array(24).keys()].map((h) => (
                     <option key={h} value={h}>
-                      {String(h).padStart(2, "0")}:00
+                      {String(h).padStart(2, '0')}:00
                     </option>
                   ))}
                 </select>
               </label>
               <label>
                 Giorno
-                <select value={values.giorno} onChange={set("giorno")}>
+                <select value={values.giorno} onChange={set('giorno')}>
                   {DAYS.map((d, i) => (
                     <option key={d} value={i + 1}>
                       {d}
@@ -971,7 +882,7 @@ export default function Home() {
                   max="10080"
                   step="any"
                   value={values.pausa}
-                  onChange={set("pausa")}
+                  onChange={set('pausa')}
                 />
               </label>
               <label>
@@ -983,7 +894,7 @@ export default function Home() {
                   max="500"
                   step="1"
                   value={values.posizione}
-                  onChange={set("posizione")}
+                  onChange={set('posizione')}
                 />
               </label>
               <label>
@@ -995,7 +906,7 @@ export default function Home() {
                   max="500"
                   step="1"
                   value={values.partite_oggi}
-                  onChange={set("partite_oggi")}
+                  onChange={set('partite_oggi')}
                 />
               </label>
               <label>
@@ -1007,7 +918,7 @@ export default function Home() {
                   max="1000"
                   step="1"
                   value={values.trend}
-                  onChange={set("trend")}
+                  onChange={set('trend')}
                 />
               </label>
             </div>
@@ -1029,8 +940,8 @@ export default function Home() {
               </div>
             </div>
             <p>
-              È una frequenza attesa su molte partite simili, non una certezza
-              sulla prossima: anche al 55% ne perdi quasi una su due.
+              È una frequenza attesa su molte partite simili, non una certezza sulla prossima: anche
+              al 55% ne perdi quasi una su due.
             </p>
             <div className="whatIfs">
               <WhatIf
@@ -1038,7 +949,7 @@ export default function Home() {
                 caption="stessa partita, cambia solo l’ora · scala ingrandita, linea = 50%"
                 items={prediction.byHour}
                 selected={Number(values.ora)}
-                labelOf={(it) => String(it.hour).padStart(2, "0")}
+                labelOf={(it) => String(it.hour).padStart(2, '0')}
               />
               <WhatIf
                 title="Se la pausa prima fosse…"
@@ -1048,7 +959,7 @@ export default function Home() {
               />
             </div>
             <h3 className="withHelp">
-              Se scegliessi un’altra apertura ({values.colore}){" "}
+              Se scegliessi un’altra apertura ({values.colore}){' '}
               <Help
                 page="confronti-multipli"
                 label="attenzione ai confronti multipli"
@@ -1058,11 +969,11 @@ export default function Home() {
             <div className="bars">
               {prediction.byOpening.map((o) => (
                 <div
-                  className={`barRow${o.opening === values.apertura ? " current" : ""}`}
+                  className={`barRow${o.opening === values.apertura ? ' current' : ''}`}
                   key={o.opening}
                 >
                   <span className="barLabel">
-                    {o.opening === "altra" ? "Altra / rara" : o.opening}
+                    {o.opening === 'altra' ? 'Altra / rara' : o.opening}
                   </span>
                   <span className="barTrack">
                     <span
@@ -1078,17 +989,16 @@ export default function Home() {
               ))}
             </div>
             <small>
-              Barre da 30% a 70%, tacca al 50%. Un modello lineare come la
-              logistica sposta tutte le curve in parallelo; alberi e foresta
-              possono cogliere interazioni (un’apertura che rende di più la
-              sera, per esempio).
+              Barre da 30% a 70%, tacca al 50%. Un modello lineare come la logistica sposta tutte le
+              curve in parallelo; alberi e foresta possono cogliere interazioni (un’apertura che
+              rende di più la sera, per esempio).
             </small>
           </div>
         )}
       </section>
       <footer>
-        Dati: API pubblica di chess.com · Scaccomatto999 · 1+0 rated · CSV e
-        modelli restano sul tuo computer
+        Dati: API pubblica di chess.com · Scaccomatto999 · 1+0 rated · CSV e modelli restano sul tuo
+        computer
       </footer>
       <GuideModal
         pageId={guidePage}
@@ -1097,9 +1007,7 @@ export default function Home() {
         onClose={closeGuide}
       />
       <footer className="projects-footer">
-        <a href="https://links-page-bennibeni.vercel.app/">
-          &larr; All projects
-        </a>
+        <a href="https://links-page-bennibeni.vercel.app/">&larr; All projects</a>
       </footer>
     </main>
   );

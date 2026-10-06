@@ -1,1 +1,278 @@
-{"schema":1,"id":"efd00185-37cd-4142-bbee-45e85bfa4cde","createdAt":"2026-09-27T16:31:38.236Z","target":"vittoria","kind":"forest","config":{"period":"tutto","trees":100,"depth":6},"features":["diff_elo","colore","pausa","posizione","ora","giorno","partite_oggi","trend","apertura"],"scores":[{"kind":"elo","train":{"brier":0.24410986743808027,"logloss":0.6804055429325415,"accuracy":0.5498088146508352},"valid":{"brier":0.24928398231683943,"logloss":0.6918103531883927,"accuracy":0.5260025873221216},"seconds":0.02},{"kind":"logistic","train":{"brier":0.24178726410832427,"logloss":0.6757781274787275,"accuracy":0.5647873961417934},"valid":{"brier":0.24798079861037245,"logloss":0.6891253338006241,"accuracy":0.5346269943941354},"seconds":0.599},{"kind":"tree","train":{"brier":0.24007285385515778,"logloss":0.6723617628594948,"accuracy":0.5712848230457407},"valid":{"brier":0.2508922377079706,"logloss":0.6952290308941416,"accuracy":0.5226390685640362},"seconds":0.377},{"kind":"forest","train":{"brier":0.23904325374066387,"logloss":0.6706761553221766,"accuracy":0.581922203375212},"valid":{"brier":0.24795382902378652,"logloss":0.6890324738024771,"accuracy":0.5354031910306166},"seconds":3.373}],"allOnTest":[{"kind":"elo","test":{"brier":0.24965460785536372,"logloss":0.692490974020582,"accuracy":0.521862871927555}},{"kind":"logistic","test":{"brier":0.2489797906721319,"logloss":0.6911674598108873,"accuracy":0.53126347563605}},{"kind":"tree","test":{"brier":0.25076565447705945,"logloss":0.6949121489355553,"accuracy":0.5225528244933161}},{"kind":"forest","test":{"brier":0.24872888099532908,"logloss":0.6906129591585144,"accuracy":0.5285899094437257}}],"test":{"brier":0.24871366338432913,"logloss":0.6905761297935665,"accuracy":0.5299698145752479},"eloTest":{"brier":0.24965460785536372,"logloss":0.692490974020582,"accuracy":0.521862871927555},"importance":[{"key":"colore","label":"Colore (con la sua apertura)","delta":0.00114438013073504,"sd":0.00016970903198954614},{"key":"diff_elo","label":"Differenza Elo (avversario − tu)","delta":0.0009173552922718154,"sd":0.0002435209453061343},{"key":"pausa","label":"Pausa prima della partita (min)","delta":0.00043007357503389577,"sd":0.00015714387832200377},{"key":"apertura","label":"Apertura (famiglia)","delta":0.0003440730694602101,"sd":0.00007844772410848792},{"key":"ora","label":"Ora di inizio","delta":0.00018314203746056524,"sd":0.00003909306831125038},{"key":"posizione","label":"Posizione nella sessione","delta":0.0000157604205695272,"sd":0.00007629070052710082},{"key":"partite_oggi","label":"Partite già giocate oggi","delta":0.000010997812391011497,"sd":0.000022086766781097457},{"key":"giorno","label":"Giorno della settimana","delta":6.311968773264898e-7,"sd":0.000022954515652220126},{"key":"trend","label":"Andamento Elo (ultime 20)","delta":-0.00001529102255152237,"sd":0.00004880403733464559}],"calibration":[{"from":0,"to":0.4,"n":666,"predicted":0.3851173839898608,"observed":0.43093093093093093},{"from":0.4,"to":0.45,"n":2514,"predicted":0.4291040695533402,"observed":0.4403341288782816},{"from":0.45,"to":0.5,"n":4679,"predicted":0.47464663929350076,"observed":0.4900619790553537},{"from":0.5,"to":0.55,"n":3266,"predicted":0.5212161589709942,"observed":0.5235762400489896},{"from":0.55,"to":0.6,"n":441,"predicted":0.5642954052815773,"observed":0.5555555555555556},{"from":0.6,"to":1,"n":29,"predicted":0.6246792485518036,"observed":0.6206896551724138}],"counts":{"read":57975,"valid":57973,"used":57973,"train":34783,"validation":11595,"test":11595},"periods":{"train":{"n":34783,"from":"2016-01-09","to":"2022-03-02","winRate":0.4923094615185579},"validation":{"n":11595,"from":"2022-03-02","to":"2024-03-20","winRate":0.4894351013367831},"test":{"n":11595,"from":"2024-03-20","to":"2026-09-27","winRate":0.48814144027598105}},"seconds":24.948,"openings":{"bianco":["English Opening","Queens Gambit","Queens Pawn Opening","Reti Opening","Slav Defense","Modern Defense","Kings Indian Defense","Englund Gambit","Indian Game","Old Benoni Defense","Sicilian Defense","altra"],"nero":["Sicilian Defense","Old Benoni Defense","Alekhines Defense","Queens Pawn Opening","French Defense","Caro Kann Defense","Scandinavian Defense","Van t Kruijs Opening","Queens Gambit","English Opening","Nimzowitsch Larsen Attack","Kings Fianchetto Opening","Indian Game","Closed Sicilian Defense","altra"]}}
+{
+  "schema": 1,
+  "id": "efd00185-37cd-4142-bbee-45e85bfa4cde",
+  "createdAt": "2026-09-27T16:31:38.236Z",
+  "target": "vittoria",
+  "kind": "forest",
+  "config": { "period": "tutto", "trees": 100, "depth": 6 },
+  "features": [
+    "diff_elo",
+    "colore",
+    "pausa",
+    "posizione",
+    "ora",
+    "giorno",
+    "partite_oggi",
+    "trend",
+    "apertura"
+  ],
+  "scores": [
+    {
+      "kind": "elo",
+      "train": {
+        "brier": 0.24410986743808027,
+        "logloss": 0.6804055429325415,
+        "accuracy": 0.5498088146508352
+      },
+      "valid": {
+        "brier": 0.24928398231683943,
+        "logloss": 0.6918103531883927,
+        "accuracy": 0.5260025873221216
+      },
+      "seconds": 0.02
+    },
+    {
+      "kind": "logistic",
+      "train": {
+        "brier": 0.24178726410832427,
+        "logloss": 0.6757781274787275,
+        "accuracy": 0.5647873961417934
+      },
+      "valid": {
+        "brier": 0.24798079861037245,
+        "logloss": 0.6891253338006241,
+        "accuracy": 0.5346269943941354
+      },
+      "seconds": 0.599
+    },
+    {
+      "kind": "tree",
+      "train": {
+        "brier": 0.24007285385515778,
+        "logloss": 0.6723617628594948,
+        "accuracy": 0.5712848230457407
+      },
+      "valid": {
+        "brier": 0.2508922377079706,
+        "logloss": 0.6952290308941416,
+        "accuracy": 0.5226390685640362
+      },
+      "seconds": 0.377
+    },
+    {
+      "kind": "forest",
+      "train": {
+        "brier": 0.23904325374066387,
+        "logloss": 0.6706761553221766,
+        "accuracy": 0.581922203375212
+      },
+      "valid": {
+        "brier": 0.24795382902378652,
+        "logloss": 0.6890324738024771,
+        "accuracy": 0.5354031910306166
+      },
+      "seconds": 3.373
+    }
+  ],
+  "allOnTest": [
+    {
+      "kind": "elo",
+      "test": {
+        "brier": 0.24965460785536372,
+        "logloss": 0.692490974020582,
+        "accuracy": 0.521862871927555
+      }
+    },
+    {
+      "kind": "logistic",
+      "test": {
+        "brier": 0.2489797906721319,
+        "logloss": 0.6911674598108873,
+        "accuracy": 0.53126347563605
+      }
+    },
+    {
+      "kind": "tree",
+      "test": {
+        "brier": 0.25076565447705945,
+        "logloss": 0.6949121489355553,
+        "accuracy": 0.5225528244933161
+      }
+    },
+    {
+      "kind": "forest",
+      "test": {
+        "brier": 0.24872888099532908,
+        "logloss": 0.6906129591585144,
+        "accuracy": 0.5285899094437257
+      }
+    }
+  ],
+  "test": {
+    "brier": 0.24871366338432913,
+    "logloss": 0.6905761297935665,
+    "accuracy": 0.5299698145752479
+  },
+  "eloTest": {
+    "brier": 0.24965460785536372,
+    "logloss": 0.692490974020582,
+    "accuracy": 0.521862871927555
+  },
+  "importance": [
+    {
+      "key": "colore",
+      "label": "Colore (con la sua apertura)",
+      "delta": 0.00114438013073504,
+      "sd": 0.00016970903198954614
+    },
+    {
+      "key": "diff_elo",
+      "label": "Differenza Elo (avversario − tu)",
+      "delta": 0.0009173552922718154,
+      "sd": 0.0002435209453061343
+    },
+    {
+      "key": "pausa",
+      "label": "Pausa prima della partita (min)",
+      "delta": 0.00043007357503389577,
+      "sd": 0.00015714387832200377
+    },
+    {
+      "key": "apertura",
+      "label": "Apertura (famiglia)",
+      "delta": 0.0003440730694602101,
+      "sd": 0.00007844772410848792
+    },
+    {
+      "key": "ora",
+      "label": "Ora di inizio",
+      "delta": 0.00018314203746056524,
+      "sd": 0.00003909306831125038
+    },
+    {
+      "key": "posizione",
+      "label": "Posizione nella sessione",
+      "delta": 0.0000157604205695272,
+      "sd": 0.00007629070052710082
+    },
+    {
+      "key": "partite_oggi",
+      "label": "Partite già giocate oggi",
+      "delta": 0.000010997812391011497,
+      "sd": 0.000022086766781097457
+    },
+    {
+      "key": "giorno",
+      "label": "Giorno della settimana",
+      "delta": 6.311968773264898e-7,
+      "sd": 0.000022954515652220126
+    },
+    {
+      "key": "trend",
+      "label": "Andamento Elo (ultime 20)",
+      "delta": -0.00001529102255152237,
+      "sd": 0.00004880403733464559
+    }
+  ],
+  "calibration": [
+    {
+      "from": 0,
+      "to": 0.4,
+      "n": 666,
+      "predicted": 0.3851173839898608,
+      "observed": 0.43093093093093093
+    },
+    {
+      "from": 0.4,
+      "to": 0.45,
+      "n": 2514,
+      "predicted": 0.4291040695533402,
+      "observed": 0.4403341288782816
+    },
+    {
+      "from": 0.45,
+      "to": 0.5,
+      "n": 4679,
+      "predicted": 0.47464663929350076,
+      "observed": 0.4900619790553537
+    },
+    {
+      "from": 0.5,
+      "to": 0.55,
+      "n": 3266,
+      "predicted": 0.5212161589709942,
+      "observed": 0.5235762400489896
+    },
+    {
+      "from": 0.55,
+      "to": 0.6,
+      "n": 441,
+      "predicted": 0.5642954052815773,
+      "observed": 0.5555555555555556
+    },
+    {
+      "from": 0.6,
+      "to": 1,
+      "n": 29,
+      "predicted": 0.6246792485518036,
+      "observed": 0.6206896551724138
+    }
+  ],
+  "counts": {
+    "read": 57975,
+    "valid": 57973,
+    "used": 57973,
+    "train": 34783,
+    "validation": 11595,
+    "test": 11595
+  },
+  "periods": {
+    "train": {
+      "n": 34783,
+      "from": "2016-01-09",
+      "to": "2022-03-02",
+      "winRate": 0.4923094615185579
+    },
+    "validation": {
+      "n": 11595,
+      "from": "2022-03-02",
+      "to": "2024-03-20",
+      "winRate": 0.4894351013367831
+    },
+    "test": { "n": 11595, "from": "2024-03-20", "to": "2026-09-27", "winRate": 0.48814144027598105 }
+  },
+  "seconds": 24.948,
+  "openings": {
+    "bianco": [
+      "English Opening",
+      "Queens Gambit",
+      "Queens Pawn Opening",
+      "Reti Opening",
+      "Slav Defense",
+      "Modern Defense",
+      "Kings Indian Defense",
+      "Englund Gambit",
+      "Indian Game",
+      "Old Benoni Defense",
+      "Sicilian Defense",
+      "altra"
+    ],
+    "nero": [
+      "Sicilian Defense",
+      "Old Benoni Defense",
+      "Alekhines Defense",
+      "Queens Pawn Opening",
+      "French Defense",
+      "Caro Kann Defense",
+      "Scandinavian Defense",
+      "Van t Kruijs Opening",
+      "Queens Gambit",
+      "English Opening",
+      "Nimzowitsch Larsen Attack",
+      "Kings Fianchetto Opening",
+      "Indian Game",
+      "Closed Sicilian Defense",
+      "altra"
+    ]
+  }
+}
